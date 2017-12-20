@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>US Square Map</title>
+    <!-- bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="d3-tip.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="statedata.js"></script>
+    <style rel="stylesheet" type="text/css">
+        button {
+            background-color:#f2f2f2;
+            text-align:center;
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 30px;
+            display: block;
+        }
+        .yeartick {
+            margin-left: 28px;
+            margin-right: 28px;
+            font-weight: bold;
+        }
+        .card-container {
+            margin-left: 50px;
+            width: 180px;
+            height: 180px;
+            position: relative;
+            border: 1px solid #ccc;
+            -webkit-perspective: 800px;
+            -moz-perspective: 800px;
+            -o-perspective: 800px;
+            perspective: 800px;
+        }
+        .card {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            -webkit-transition: -webkit-transform 1s;
+            -moz-transition: -moz-transform 1s;
+            -o-transition: -o-transform 1s;
+            transition: transform 1s;
+            -webkit-transform-style: preserve-3d;
+            -moz-transform-style: preserve-3d;
+            -o-transform-style: preserve-3d;
+            transform-style: preserve-3d;
+            -webkit-transform-origin: 50% 50%;
+        }
+        .card div {
+            display: block;
+            height: 100%;
+            width: 100%;
+            line-height: 180px;
+            color: white;
+            text-align: center;
+            font-weight: bold;
+            font-size: 20px;
+            position: absolute;
+            -webkit-backface-visibility: hidden;
+            -moz-backface-visibility: hidden;
+            -o-backface-visibility: hidden;
+            backface-visibility: hidden;
+        }
+        .card .front {
+            background: black;
+        }
+        .card .back {
+            background: black;
+            -webkit-transform: rotateY( 180deg );
+            -moz-transform: rotateY( 180deg );
+            -o-transform: rotateY( 180deg );
+            transform: rotateY( 180deg );
+        }
+        .card.flipped {
+            -webkit-transform: rotateY( 180deg );
+            -moz-transform: rotateY( 180deg );
+            -o-transform: rotateY( 180deg );
+            transform: rotateY( 180deg );
+            background: transparent;
+        }
+        g rect:hover{
+            opacity: 0.5;
+        }
+        .d3-tip {
+            line-height: 1;
+            font-weight: bold;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            border-radius: 2px;
+        }
+
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-default navbar-expand-lg navbar-light bg-light" role='navigation'>
+      <a class="navbar-brand" href="../map1/map1.1.html">H1b 2011-2016</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+        <div class="nav navbar-nav navbar-right">
+          <a class="nav-item nav-link" href="../index.html">Introduction</a>
+          <a class="nav-item nav-link" href="./viz2.html">State</a>
+          <a class="nav-item nav-link" href="../part3/barcharts.html ">UX vs DS</a>
+          <a class="nav-item nav-link" href="../conclusion/conclusion.html">Conclusion</a>
+          <a href=""></a>
+        </div>
+      </div>
+    </nav>
+
+    <div>
+        <div id="viz2-container" style="display: inline-block">
+            <svg id="viz2-svg"></svg>
+        </div>
+
+        <div style="display: inline-block; margin-left: 50px;">
+            <section class="card-container">
+                <div class="card" onclick="flip()">
+                    <div class="front">Data Science</div>
+                    <div class="back">UX Design</div>
+                    <script>
+                        var fhand = "ds.json";
+
+                        function flip() {
+                            $('.card').toggleClass('flipped');
+                            if (fhand === "ds.json") {
+                                fhand = "ux.json";
+                            }
+                            else {
+                                fhand = "ds.json";
+                            }
+                            drawViz2(fhand, year, choice);
+                        }
+                    </script>
+                </div>
+            </section>
+
+            <button id="button-state">View Application Intensity</button>
+            <button id="button-status">View Application Status</button>
+            <button id="button-salary">View Salary Range</button>
+            <button id="button-employer">View Hot Employers</button>
+            <button id="button-job">View Hot Jobs</button>
+        </div>
+
+    </div>
+
+    <div style="width: 600px; margin-left: 200px;">
+        <input type="range" min="2011" max="2016" value="2016" id="viz2-year" style="width: 86%; margin-left: 42px;">
+        <p>
+            <span class="yeartick">2011</span>
+            <span class="yeartick">2012</span>
+            <span class="yeartick">2013</span>
+            <span class="yeartick">2014</span>
+            <span class="yeartick">2015</span>
+            <span class="yeartick">2016</span>
+        </p>
+    </div>
+
+    <script>
+        // initialize & event listener
+        var year = 2016,
+            choice = "state",
+            buttonClicked = null;
+
+        d3.select("#viz2-year")
+            .on("input", function() {
+                year = +this.value;
+                drawViz2(fhand, year, choice);
+            });
+        d3.select("#button-state")
+            .on("click", function(){
+                choice = "state";
+                highlight(this);
+                drawViz2(fhand, year, choice);
+            });
+        d3.select("#button-employer")
+            .on("click", function(){
+                choice = "employer";
+                highlight(this);
+                drawViz2(fhand, year, choice);
+            });
+        d3.select("#button-job")
+            .on("click", function(){
+                choice = "job";
+                highlight(this);
+                drawViz2(fhand, year, choice);
+            });
+        d3.select("#button-salary")
+            .on("click", function(){
+                choice = "salary";
+                highlight(this);
+                drawViz2(fhand, year, choice);
+            });
+        d3.select("#button-status")
+            .on("click", function(){
+                choice = "status";
+                highlight(this);
+                drawViz2(fhand, year, choice);
+            });
+
+
+        // function for highlighting selected button
+        function highlight(button) {
+            if (buttonClicked != null) {
+                buttonClicked.style.background = "#f2f2f2";
+                buttonClicked.style.color = "black";
+            }
+            buttonClicked = button;
+            buttonClicked.style.background = "black";
+            buttonClicked.style.color = "white";
+        }
+
+        highlight(document.getElementById("button-state"));
+
+
+        // function for drawing visualization 2
+        function drawViz2(fhand, year, choice) {
+            d3.json(fhand, function(error, data) {
+                if (error) throw error;
+
+                // use selected year data & create new svg
+                useData = data[year];
+                width = 960;
+                height = 600;
+                margin = {top:30, bottom:30, left:30, right:20};
+
+                d3.select("#viz2-svg").remove();
+                var viz2svg = d3.select("#viz2-container")
+                    .append("svg")
+                    .attr("id", "viz2-svg")
+                    .attr("width", width)
+                    .attr("height", height);
+
+                // scale functions
+                var longtitudeScale = d3.scaleLinear()
+                    .domain([-123, -69])
+                    .range([0, width-margin.left-margin.right]);
+                var latitudeScale = d3.scaleLinear()
+                    .domain([27, 48])
+                    .range([height-margin.top-margin.bottom, 0]);
+                var applicationScale = d3.scaleLinear()
+                    .domain([0, 3600])
+                    .range([35, 180]);
+
+                // adapt to selected choice
+                // show stateData
+                if (choice === "state") {
+                    console.log("state selected");
+                    console.log(stateData);
+
+                    for (state in useData) {
+                        if (state !== "NA") {
+                            var stateAbbr = stateData[state].abbr,
+                                latitude = stateData[state].latitude,
+                                longtitude = stateData[state].longitude,
+                                application = useData[state]["APPLICATION"],
+                                population = stateData[state].population,
+                                appIntensity = application/population;
+
+                            var appIntensityScale = d3.scaleLinear()
+                                .domain([0, 0.00005])
+                                .range(["#9CA1A1", "black"]);
+
+                            var tip = d3.tip()
+                                .attr('class', 'd3-tip')
+                                .offset([-10, 0])
+                                .html("Application: " + application + "</br>Application/Population: " + (appIntensity*1000).toFixed(4) + "‰");
+                            viz2svg.call(tip);
+
+                            var g = viz2svg.append("g")
+                                .attr("class", "state-g");
+
+                            var sideLength = applicationScale(application),
+                                x = longtitudeScale(longtitude),
+                                y = latitudeScale(latitude);
+                            g.append("rect")
+                                .attr("fill", appIntensityScale(appIntensity))
+                                .attr("stroke", "white")
+                                .attr("stroke-width", 1)
+                                .attr("width", sideLength)
+                                .attr("height", sideLength)
+                                .attr("x", x)
+                                .attr("y", y)
+                                .on('mouseover', tip.show)
+                                .on('mouseout', tip.hide);
+                            g.append("text")
+                                .text(stateAbbr)
+                                .attr("fill", "white")
+                                .attr("x", x + sideLength/2)
+                                .attr("y", y + sideLength/2)
+                                .attr("text-anchor", "middle")
+                                .attr("font-size", 12);
+                        }
+                    }
+
+                }
+                // other choices
+                else{
+                    console.log(choice + " selected");
+                    console.log(useData);
+
+                    for (state in useData) {
+                        if (state !== "NA") {
+                            var stateAbbr = stateData[state].abbr,
+                                latitude = stateData[state].latitude,
+                                longtitude = stateData[state].longitude,
+                                application = useData[state]["APPLICATION"];
+
+                            var g = viz2svg.append("g")
+                                .attr("class", choice+"-g");
+
+                            var sideLength = applicationScale(application),
+                                x = longtitudeScale(longtitude),
+                                y = latitudeScale(latitude);
+
+                            if (choice === "employer") {
+                                var employer = useData[state]["EMPLOYER"],
+                                    employerArr = [];
+                                for (e in employer) {
+                                    employerArr.push([e, employer[e]]);
+                                }
+                                employerArr.sort(function(a, b) {
+                                    return b[1]-a[1];
+                                });
+
+                                var accumRatio = 0,
+                                    empColor = ["#0097ba", "#4ab796", "#59c2ca", "#FF6A58", "#FFAF00", "#e0e6e7", "#e0e6e7", "#e0e6e7", "#e0e6e7", "#e0e6e7"];
+                                for (var idx = 0; idx < employerArr.length; idx++){
+                                    var empName = employerArr[idx][0],
+                                        empRatio = employerArr[idx][1];
+
+                                    var tip = d3.tip()
+                                        .attr('class', 'd3-tip')
+                                        .offset([-10, 0])
+                                        .html(empName + ": " + (empRatio*100).toFixed(2) + "%");
+                                    viz2svg.call(tip);
+
+                                    g.append("rect")
+                                        .attr("class", "employer"+idx)
+                                        .attr("fill", empColor[idx])
+                                        .attr("stroke", "grey")
+                                        .attr("stroke-width", 0.5)
+                                        .attr("width", sideLength)
+                                        .attr("height", sideLength*empRatio)
+                                        .attr("x", x)
+                                        .attr("y", y+sideLength*accumRatio)
+                                        .on("mouseover", tip.show)
+                                        .on("mouseout", tip.hide);
+
+                                    accumRatio += empRatio;
+                                }
+                            }
+                            else if (choice === "job") {
+                                var job = useData[state]["SOC_NAME"],
+                                    jobArr = [];
+                                for (j in job) {
+                                    jobArr.push([j, job[j]]);
+                                }
+                                jobArr.sort(function(a, b) {
+                                    return b[1]-a[1];
+                                });
+
+                                var jobColor = ["#0097ba", "#4ab796", "#59c2ca", "#FF6A58", "#FFAF00", "#e0e6e7", "#e0e6e7", "#e0e6e7", "#e0e6e7", "#e0e6e7"];
+
+                                var accumRatio = 0;
+                                for (var idx = 0; idx < jobArr.length; idx++){
+                                    var jobName = jobArr[idx][0],
+                                        jobRatio = jobArr[idx][1];
+
+                                    var tip = d3.tip()
+                                        .attr('class', 'd3-tip')
+                                        .offset([-10, 0])
+                                        .html(jobName + ": " + (jobRatio*100).toFixed(2) + "%");
+                                    viz2svg.call(tip);
+
+                                    g.append("rect")
+                                        .attr("class", "job"+idx)
+                                        .attr("fill", jobColor[idx])
+                                        .attr("stroke", "grey")
+                                        .attr("stroke-width", 0.5)
+                                        .attr("width", sideLength)
+                                        .attr("height", sideLength*jobRatio)
+                                        .attr("x", x)
+                                        .attr("y", y+sideLength*accumRatio)
+                                        .on("mouseover", tip.show)
+                                        .on("mouseout", tip.hide);
+
+                                    accumRatio += jobRatio;
+                                }
+
+                            }
+                            else if (choice === "salary") {
+                                var salary = useData[state]["WAGE"],
+                                    high = salary["HIGH"],
+                                    mid = salary["MID"],
+                                    low = salary["LOW"],
+                                    accumRatio = 0;
+
+                                var tip1 = d3.tip()
+                                    .attr('class', 'd3-tip')
+                                    .offset([-10, 0])
+                                    .html("High: " + (high*100).toFixed(2) + "%");
+                                var tip2 = d3.tip()
+                                    .attr('class', 'd3-tip')
+                                    .offset([-10, 0])
+                                    .html("Medium: " + (mid*100).toFixed(2) + "%");
+                                var tip3 = d3.tip()
+                                    .attr('class', 'd3-tip')
+                                    .offset([-10, 0])
+                                    .html("Low: " + (low*100).toFixed(2) + "%");
+                                viz2svg.call(tip1);
+                                viz2svg.call(tip2);
+                                viz2svg.call(tip3);
+
+                                if (high !== undefined) {
+                                    g.append("rect")
+                                        .attr("class", "salary-high")
+                                        .attr("fill", "#0097BA")
+                                        .attr("stroke", "grey")
+                                        .attr("stroke-width", 0.5)
+                                        .attr("width", sideLength*high)
+                                        .attr("height", sideLength)
+                                        .attr("x", x)
+                                        .attr("y", y)
+                                        .on("mouseover", tip1.show)
+                                        .on("mouseout", tip1.hide);
+                                    accumRatio += high;
+                                }
+                                if (mid !== undefined) {
+                                    g.append("rect")
+                                        .attr("class", "salary-mid")
+                                        .attr("fill", "#59C2CA")
+                                        .attr("stroke", "grey")
+                                        .attr("stroke-width", 0.5)
+                                        .attr("width", sideLength*mid)
+                                        .attr("height", sideLength)
+                                        .attr("x", x+sideLength*accumRatio)
+                                        .attr("y", y)
+                                        .on("mouseover", tip2.show)
+                                        .on("mouseout", tip2.hide);
+                                    accumRatio += mid;
+                                }
+                                if (low != undefined) {
+                                    g.append("rect")
+                                        .attr("class", "salary-low")
+                                        .attr("fill", "#FF6A58")
+                                        .attr("stroke", "grey")
+                                        .attr("stroke-width", 0.5)
+                                        .attr("width", sideLength*low)
+                                        .attr("height", sideLength)
+                                        .attr("x", x+sideLength*accumRatio)
+                                        .attr("y", y)
+                                        .on("mouseover", tip3.show)
+                                        .on("mouseout", tip3.hide);
+                                    accumRatio += low;
+                                }
+
+                                viz2svg.append("rect")
+                                    .attr("class", "salary-legend")
+                                    .attr("fill", "#0097BA")
+                                    .attr("width", 60)
+                                    .attr("height", 20)
+                                    .attr("x", 820)
+                                    .attr("y", 450);
+                                viz2svg.append("rect")
+                                    .attr("class", "salary-legend")
+                                    .attr("fill", "#59C2CA")
+                                    .attr("width", 60)
+                                    .attr("height", 20)
+                                    .attr("x", 820)
+                                    .attr("y", 480);
+                                viz2svg.append("rect")
+                                    .attr("class", "salary-legend")
+                                    .attr("fill", "#FF6A58")
+                                    .attr("width", 60)
+                                    .attr("height", 20)
+                                    .attr("x", 820)
+                                    .attr("y", 510);
+                                viz2svg.append("text")
+                                    .text("High")
+                                    .attr("class", "salary-legend")
+                                    .attr("font-size", 16)
+                                    .attr("x", 890)
+                                    .attr("y", 465);
+                                viz2svg.append("text")
+                                    .text("Medium")
+                                    .attr("class", "salary-legend")
+                                    .attr("font-size", 16)
+                                    .attr("x", 890)
+                                    .attr("y", 495);
+                                viz2svg.append("text")
+                                    .text("Low")
+                                    .attr("class", "salary-legend")
+                                    .attr("font-size", 16)
+                                    .attr("x", 890)
+                                    .attr("y", 525);
+
+                            }
+                            else if (choice === "status") {
+                                var status = useData[state]["STATUS"],
+                                    C = status["CERTIFIED"],
+                                    nonC = 1-C;
+
+                                var tip1 = d3.tip()
+                                    .attr('class', 'd3-tip')
+                                    .offset([-10, 0])
+                                    .html("Certified: " + (C*100).toFixed(2
+                                        ) + "%");
+                                var tip2 = d3.tip()
+                                    .attr('class', 'd3-tip')
+                                    .offset([-10, 0])
+                                    .html("Non-Certified: " + (nonC*100).toFixed(2) + "%");
+                                viz2svg.call(tip1);
+                                viz2svg.call(tip2);
+
+                                if (C !== undefined) {
+                                    g.append("rect")
+                                        .attr("class", "status-c")
+                                        .attr("fill", "#0097BA")
+                                        .attr("stroke", "grey")
+                                        .attr("stroke-width", 0.5)
+                                        .attr("width", sideLength*C)
+                                        .attr("height", sideLength)
+                                        .attr("x", x)
+                                        .attr("y", y)
+                                        .on('mouseover', tip1.show)
+                                        .on('mouseout', tip1.hide);
+                                    g.append("rect")
+                                        .attr("class", "status-d")
+                                        .attr("fill", "#FF6A58")
+                                        .attr("stroke", "grey")
+                                        .attr("stroke-width", 0.5)
+                                        .attr("width", sideLength*nonC)
+                                        .attr("height", sideLength)
+                                        .attr("x", x+sideLength*C)
+                                        .attr("y", y)
+                                        .on('mouseover', tip2.show)
+                                        .on('mouseout', tip2.hide);
+                                }
+
+                                viz2svg.append("rect")
+                                    .attr("class", "status-legend")
+                                    .attr("fill", "#0097BA")
+                                    .attr("width", 60)
+                                    .attr("height", 20)
+                                    .attr("x", 800)
+                                    .attr("y", 480);
+                                viz2svg.append("rect")
+                                    .attr("class", "status-legend")
+                                    .attr("fill", "#FF6A58")
+                                    .attr("width", 60)
+                                    .attr("height", 20)
+                                    .attr("x", 800)
+                                    .attr("y", 510);
+                                viz2svg.append("text")
+                                    .text("Certified")
+                                    .attr("class", "status-legend")
+                                    .attr("font-size", 16)
+                                    .attr("x", 870)
+                                    .attr("y", 495);
+                                viz2svg.append("text")
+                                    .text("Non-Certified")
+                                    .attr("class", "status-legend")
+                                    .attr("font-size", 16)
+                                    .attr("x", 870)
+                                    .attr("y", 525);
+                            }
+
+                            g.append("text")
+                                .text(stateAbbr)
+                                .attr("fill", "white")
+                                .attr("x", x + sideLength/2)
+                                .attr("y", y + sideLength/2)
+                                .attr("text-anchor", "middle")
+                                .attr("font-size", 12);
+                        }
+                    }
+                }
+
+
+
+
+            });
+        }
+
+        drawViz2("ds.json", 2016, "state");
+
+    </script>
+
+</body>
+
+</html>

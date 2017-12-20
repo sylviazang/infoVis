@@ -1,0 +1,98 @@
+    #part3-body {
+        font-family: 'Lato', sans-serif;;
+        width: 1000px;
+        height: 1000px;
+        position: relative;
+    }
+
+ #part3-svg {
+        width: 100%;
+        height: 100%;
+        position: center;
+    }
+
+
+    .toolTip {
+        font-family: 'Lato', sans-serif;
+        position: absolute;
+        display: none;
+        width: auto;
+        height: auto;
+        background: none repeat scroll 0 0 white;
+        border: 0 none;
+        border-radius: 8px 8px 8px 8px;
+        box-shadow: -3px 3px 15px #888888;
+        color: black;
+        font: 12px sans-serif;
+        padding: 5px;
+        text-align: center;
+    }
+
+    text {
+        font: 10px sans-serif;
+        color: black;
+    }
+    text.value {
+        font-size: 80%;
+        fill: black;
+    }
+
+    .axisHorizontal path{
+        fill: none;
+    }
+
+    .axisHorizontal .tick line {
+        stroke-width: 1;
+        stroke: rgba(0, 0, 0, 0.2);
+    }
+
+    .ux_bar {
+        fill: rgb(224,230,231);
+        fill-opacity: 1;
+    }
+
+    .ux_bar_pass {
+        fill: rgb(74,183,150);
+        fill-opacity:1;
+    }
+
+/*    .ux_bar:hover {
+        fill: rgb(255,106,88);
+    }*/
+
+    .ds_bar {
+        fill: rgb(224,230,231);
+        fill-opacity: 1;
+    }
+
+    .ds_bar_pass {
+        fill: rgb(255,175,0);
+        fill-opacity: 1;
+    }
+
+/*    .ds_bar:hover {
+        fill: rgb(255,106,88);
+    }*/
+    .label{
+        fill: black;
+    }
+#drop{
+    margin:20px 20px 10px 60px;
+    display: inline-block;
+}
+
+#ds{
+    display: inline-block;
+    font-size: 18px;
+    margin-left:200px;
+    text-align: right;
+}
+#ux{
+    display: inline-block;
+    font-size: 18px;
+    margin-left: 150px;
+    text-align: left;
+}
+#title{
+    text-align: center;
+}

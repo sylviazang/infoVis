@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<head>
+<style>
+
+
+/*python -m SimpleHTTPServer  */
+/*http://localhost:8000*/
+
+.state-borders {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 0px;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  pointer-events: none;
+}
+
+.states {
+  fill: black;
+  stroke: black;
+}
+
+body{
+    background-color: black
+}
+.part1-svg{
+    display: block;
+    padding: -50px;
+    position: absolute;
+    margin: auto;
+    /*position: relative;*/
+    padding-top: 100px;
+    left: 5%;
+}
+
+.part1-button-block-all{
+    /*margin: auto;*/
+    /*padding-bottom: 20%;*/
+    position: absolute;
+    display: inline-block;
+    width: 20%;
+    margin-top: 100px;
+    padding-left: 50px;
+
+}
+
+.part1-button{
+    height: 50px;
+    width: 100px;
+    color: White;
+    background-color: black;
+    position:fixed;
+    left:85%;
+    top: 10%;
+    border :none;
+    font-size: 30px;
+}
+
+#p1-svg1{
+
+}
+</style>
+</head>
+
+<body>
+<!-- <div> -->
+<svg id="p1-svg" class="part1-svg" width=90% height=700></svg>
+<!-- <svg id="p1-svg1" class="part1-svg-1" width=20% height=700></svg> -->
+<!-- </div> -->
+<button class="part1-button" id="p1-button" type="button" onclick=removeall()>Skip>>></button>
+
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<!-- <script src="https://d3js.org/topojson.v2.min.js"></script> -->
+<script src="http://d3js.org/topojson.v1.min.js"></script>
+<script src="http://d3js.org/queue.v1.min.js"></script>
+<!-- <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script src="http://d3js.org/topojson.v1.min.js"></script> -->
+<script>
+
+var svg = d3.select("svg");
+
+
+console.log(svg)
+var st = 0
+var path = d3.geoPath();
+// var projection = d3.geo.mercator();
+var projection = d3.geoAlbers()
+var color_list = ["White","yellow"]
+
+// aa = [-122.419416, 37.774929, 5];
+// bb = [-74.005973, 40.712775, 10];
+// cc = [-80.191790 ,25.761680, 3 ]
+
+queue()
+	.defer(d3.json, "dt2.json")
+	.await(ready);
+
+function ready1(error, dt) {
+    showall(dt)
+}
+
+
+function ready(error, dt) {
+    var data_cache = dt;
+    d3.json("https://d3js.org/us-10m.v1.json", function(error, us) {
+        projection
+          .scale(1275)
+          .center([-0.6, 41])
+
+      svg.append("rect")
+        .attr("width", "100%")
+        .attr("height", "100%")
+        .attr("fill", "black");
+      svg.append("g")
+	      .attr("class", "states")
+	      .selectAll("path")
+	      .data(topojson.feature(us, us.objects.states).features)
+	      .enter().append("path")
+	      .attr("d", path)
+          .attr("stroke","black")
+          .transition()
+          .duration(20000)
+          .attr("stroke","grey")
+          svg.append("text")
+                 .text("")
+                 .attr("id","intro1")
+                 .attr("x","75%")
+                .attr("y","20%")
+                .attr("font-size", "18px")
+                 .attr("fill","black")
+         svg.append("text")
+                .text("")
+                .attr("id","intro2")
+                .attr("x","75%")
+               .attr("y","25%")
+               .attr("font-size", "18px")
+                .attr("fill","black")
+          svg.append("text")
+                   .text("")
+                   .attr("id","intro3")
+                   .attr("x","75%")
+                  .attr("y","30%")
+                  .attr("font-size", "18px")
+                   .attr("fill","black")
+           svg.append("text")
+                    .text("")
+                    .attr("id","intro4")
+                    .attr("x","75%")
+                   .attr("y","40%")
+                   .attr("font-size", "18px")
+                    .attr("fill","black")
+            svg.append("text")
+                     .text("")
+                     .attr("id","intro5")
+                     .attr("x","75%")
+                    .attr("y","45%")
+                    .attr("font-size", "18px")
+                     .attr("fill","black")
+      svg.append("path")
+
+          .attr("opacity",1)
+          .attr("class", "state-borders")
+          .attr("d", path(topojson.mesh(us, us.objects.states, function(a, b) { return a !== b; })));
+    })
+
+	myloop(dt);
+    // console.log(dt)
+
+
+    setTimeout(change1,4000)
+    setTimeout(removetext,10000)
+    setTimeout(change2,12000)
+    setTimeout(removetext,16000)
+    setTimeout(change3,18000)
+    setTimeout(removeall,28000)
+
+}
+function change1(){
+    svg.select("#intro1")
+        .text("H-1B is a nonimmigrant classification")
+        .transition()
+        .duration(2000)
+        .attr("fill","White")
+    svg.select("#intro2")
+        .text("for temporary employment in a ")
+        .transition()
+        .duration(2000)
+        .attr("fill","White")
+    svg.select("#intro3")
+        .text("specialty occupation. ")
+        .transition()
+        .duration(2000)
+        .attr("fill","White")
+    svg.select("#intro4")
+        .text("From 2011 to 2016, there were total")
+        .transition()
+        .duration(2000)
+        .attr("fill","White")
+    svg.select("#intro5")
+        .text("3 million H-1B applications.")
+        .transition()
+        .duration(2000)
+        .attr("fill","White")
+}
+
+function removetext(){
+    svg.select("#intro1")
+        .transition()
+        .duration(2000)
+        .attr("fill","black")
+    svg.select("#intro2")
+        .transition()
+        .duration(2000)
+        .attr("fill","black")
+    svg.select("#intro3")
+        .transition()
+        .duration(2000)
+        .attr("fill","black")
+    svg.select("#intro4")
+        .transition()
+        .duration(2000)
+        .attr("fill","black")
+    svg.select("#intro5")
+        .transition()
+        .duration(2000)
+        .attr("fill","black")
+}
+function change2(){
+    svg.select("#intro1")
+        .text("")
+        .transition()
+        .duration(2000)
+        .attr("fill","white")
+
+    svg.select("#intro2")
+        .text("19,703 of them are UX Designer")
+        .attr("font-size", "21px")
+        .transition()
+        .duration(2000)
+        .attr("fill","white")
+
+    svg.select("#intro3")
+        .text("")
+        .transition()
+        .duration(2000)
+        .attr("fill","white")
+
+    svg.select("#intro4")
+        .text("66,147 are Data Scientist")
+        .attr("font-size", "21px")
+        .transition()
+        .duration(2000)
+        .attr("fill","white")
+    svg.select("#intro5")
+        .text("")
+        .transition()
+        .duration(2000)
+        .attr("fill","white")
+}
+
+function change3(){
+    svg.select("#intro1")
+        .transition()
+        .duration(2000)
+        .text("")
+        .attr("fill","white")
+    svg.select("#intro2")
+    .text("Let's explore more about")
+    .attr("font-size", "20px")
+        .transition()
+        .duration(2000)
+        .attr("fill","white")
+    svg.select("#intro3")
+        .text("")
+        .attr("font-size", "20px")
+        .transition()
+        .duration(2000)
+        .attr("fill","white")
+    svg.select("#intro4")
+        .transition()
+        .duration(2000)
+        .text("H-1B petitions...")
+        .attr("font-size", "30px")
+        .attr("fill","white")
+    svg.select("#intro5")
+        .transition()
+        .duration(2000)
+        .text("")
+        .attr("font-size", "20px")
+        .attr("fill","white")
+
+}
+
+
+function removeall(){
+    svg.selectAll("g")
+        .transition()
+        .duration(duration)
+        .attr("stroke","black")
+        .remove()
+    svg.selectAll("rect")
+        .transition()
+        .duration(duration)
+        .attr("fill","black")
+        .remove()
+
+    svg.selectAll("path")
+        .transition()
+        .duration(duration)
+        .attr("opacity",0)
+        .remove()
+    svg.selectAll("circle")
+        .transition()
+        .duration(duration)
+        .attr("opacity",0)
+        .remove()
+    svg.selectAll("text")
+        .transition()
+        .duration(duration)
+        .attr("fill","black")
+        .remove()
+    setTimeout(function () {
+        document.getElementById("p1-svg").style.display = "none";
+        document.getElementById("p1-button").style.display = "none";
+        window.location.href = "../index.html";
+    }, 2000)
+
+
+}
+
+function myloop(data){
+	setTimeout(function () {
+      mystep(data[st]);
+      st++;
+	  if (st < 12) {
+         myloop(data);
+      }
+  }, 2000)
+
+}
+
+duration=1000;
+function mystep(data){
+	// console.log(data);
+    // console.log(data.length)
+	test_data = []
+	for (i = 0; i < data.length; i++){
+		test_data.push([ data[i].lon, data[i].lat , data[i].track, data[i].count])
+	}
+
+	  // svg.selectAll("circle").remove()
+
+	  svg.selectAll("circle").remove()
+
+      svg.selectAll("circle")
+	  		.data(test_data).enter()
+	  		.append("circle")
+	  		.attr("cx", function (d) { return projection(d)[0]; })
+	  		.attr("cy", function (d) { return projection(d)[1]; })
+            .transition()
+            .duration(duration)
+			.attr("r",2)
+	  		.attr("fill", function(d){
+				return color_list[d[2]]
+			})
+			.attr("opacity", function (d) {return parseFloat(d[3])/10;})
+    svg.select("#year").remove()
+    svg.append("text")
+           .text(function(d){
+               return parseInt(st/2) + 2011
+           })
+           .attr("id", "year")
+           .attr("x","77%")
+           .attr("y","70%")
+           .attr("font-size", "30px")
+           .attr("fill","White")
+    svg.append("rect")
+            .attr("width", "5%")
+            .attr("height", "2%")
+            .attr("x", "77%")
+            .attr("y", "80%")
+            .attr("fill", "white")
+    svg.append("rect")
+            .attr("width", "5%")
+            .attr("height", "2%")
+            .attr("x", "77%")
+            .attr("y", "85%")
+            .attr("fill", "yellow")
+     svg.append("text")
+            .text("Data Science")
+            .attr("x","84%")
+			.attr("y","82%")
+			.attr("font-size", "18px")
+            .attr("fill","White")
+    svg.append("text")
+           .text("UX Design")
+           .attr("x","84%")
+			.attr("y","87%")
+			.attr("font-size", "18px")
+            .attr("fill","White")
+
+
+}
+</script>
+
+</body>
